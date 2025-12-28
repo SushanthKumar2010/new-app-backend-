@@ -4,20 +4,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google import genai
 
-try:
-    from prompts import get_educational_prompt
-except ImportError:
-    print("⚠️ prompts.py not found - using inline prompts")
-
 # ======================
-# CONFIG
+# CONFIG (NO ENV NEEDED)
 # ======================
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     raise RuntimeError("❌ GEMINI_API_KEY not set in Render Environment Variables")
 
-MODEL_NAME = os.getenv("MODEL_NAME", "gemini-2.5-flash")
+MODEL_NAME = "gemini-2.5-flash"  # ✅ Hardcoded - NO ENV needed
+
 print(f"✅ Using model: {MODEL_NAME}")
 
 # ======================
@@ -49,7 +45,7 @@ except Exception as e:
     client = None
 
 # ======================
-# MODELS
+# MODELS (matching your frontend)
 # ======================
 
 class QuestionRequest(BaseModel):
@@ -59,7 +55,7 @@ class QuestionRequest(BaseModel):
     question: str
 
 # ======================
-# CHAPTERS
+# CHAPTER VALIDATION (matching your frontend)
 # ======================
 
 CHAPTERS = {
@@ -89,63 +85,24 @@ def health():
     }
 
 @app.post("/api/ask")
-async def ask_ap_ssc_question(request: QuestionRequest):  # ✅ ASYNC
-    """Main endpoint - matches your frontend"""
+async def ask_ap_ssc_question(request: QuestionRequest):
+    """✅ Main endpoint - matches your frontend exactly (fixes 405 error)"""
     
     print(f"📨 Request: {request.dict()}")  # Debug log
     
-    # Validate chapter
+    # Validate chapter exists (matching your frontend)
     if request.chapter not in CHAPTERS.get(request.subject, []):
         raise HTTPException(status_code=400, detail="Invalid chapter for subject")
     
     if not client:
-        raise HTTPException(status_code=500, detail="Gemini client not initialized")
+        raise HTTPException(status_code=500, detail="Gemini client not initialized - check GEMINI_API_KEY")
     
     try:
-        # Simple inline prompt (no prompts.py dependency)
+        # ✅ Advanced educational prompt (inline - no prompts.py needed)
         prompt = f"""
-You are an expert AP SSC Class {request.class_level} tutor.
+You are an expert AP SSC Class {request.class_level} tutor preparing students for board exams.
 
-Subject: {request.subject}
-Chapter: {request.chapter}
-Question: {request.question}
+📖 **SUBJECT**: {request.subject}
+📚 **CHAPTER**: {request.chapter}
 
-Provide detailed textbook-style explanation for board exams.
-Include examples and practice questions.
-"""
-        
-        print(f"📝 Prompt length: {len(prompt)} chars")
-        
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=prompt,
-            generation_config={
-                "temperature": 0.3,
-                "max_output_tokens": 800,
-            }
-        )
-        
-        answer = response.text or "No response generated"
-        print(f"✅ Answer length: {len(answer)} chars")
-        
-    except Exception as e:
-        print(f"❌ Gemini error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"AI Error: {str(e)}")
-
-    return {
-        "answer": answer,
-        "meta": {
-            "class_level": request.class_level,
-            "subject": request.subject,
-            "chapter": request.chapter,
-        },
-    }
-
-@app.get("/api/ask")
-async def ask_get():
-    raise HTTPException(status_code=405, detail="Use POST")
-
-if __name__ == "__main__":
-    import uvicorn
-    port = int(os.getenv("PORT", 10000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port)
+**విద్యార్థి ప్రశ్న / Student Question:**
