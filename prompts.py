@@ -1,70 +1,108 @@
-def build_ap_prompt(
-    class_level: str,
-    subject: str,
-    chapter: str,
-    question: str
-) -> str:
+# prompts.py - Advanced educational prompts for AP SSC Class 10
+SUBJECT_TEMPLATES = {
+    "Mathematics": """
+    You are teaching AP SSC Class 10 Mathematics.
+    
+    Question: {question}
+    Chapter: {chapter}
+    
+    Provide:
+    1. Step-by-step solution with formulas
+    2. 2 solved examples 
+    3. 1 practice question with answer
+    4. Common exam mistakes to avoid
+    
+    Use simple language. Include diagrams in text form.
+    """,
+    
+    "Science": """
+    You are teaching AP SSC Class 10 Science.
+    
+    Question: {question}
+    Chapter: {chapter}
+    
+    Answer format:
+    1. Definition + diagram (text-based)
+    2. Key concepts with examples
+    3. 2-mark/4-mark question style
+    4. Practical application
+    
+    Use textbook terminology exactly.
+    """,
+    
+    "English": """
+    You are teaching AP SSC Class 10 English.
+    
+    Question: {question}
+    Chapter: {chapter}
+    
+    Provide:
+    1. Detailed explanation with quotes
+    2. Character/theme analysis
+    3. Important lines for exams
+    4. 5-mark question answer format
+    """,
+    
+    "Telugu": """
+    మీరు AP SSC 10వ తరగతి తెలుగు గురువు.
+    
+    ప్రశ్న: {question}
+    అధ్యాయం: {chapter}
+    
+    తెలుగులో వివరంగా వివరించండి:
+    1. ముఖ్య భావాలు
+    2. కవి/సాహిత్యకారుడి ప్రత్యేకతలు
+    3. పరీక్షకు ముఖ్యమైన పంక్తులు
+    4. 5 మార్కుల ప్రశ్నలకు సమాధానం
+    """,
+    
+    "Social Studies": """
+    You are teaching AP SSC Class 10 Social Studies.
+    
+    Question: {question}
+    Chapter: {chapter}
+    
+    Structured answer:
+    1. Historical context + timeline
+    2. Key events with dates
+    3. Important personalities
+    4. Map work (describe locations)
+    5. Exam-style long answer
     """
-    Builds AP SSC specific prompt for Gemini.
+}
 
-    Args:
-        class_level: "10"
-        subject: "Mathematics", "Science", etc.
-        chapter: "Quadratic Equations", etc.
-        question: Student's actual question
+def get_educational_prompt(subject: str, chapter: str, question: str, 
+                          class_level: str, language: str, contexts: dict) -> str:
+    """Generate complete educational prompt"""
+    
+    # Base template
+    template = SUBJECT_TEMPLATES.get(subject, """
+    You are an AP SSC Class 10 {subject} teacher.
+    
+    Question: {question}
+    Chapter: {chapter}
+    
+    Provide detailed textbook-style explanation for board exams.
+    Include examples, key points, and practice questions.
+    """)
+    
+    # Subject context
+    context = contexts.get(subject, {}).get(chapter, "")
+    
+    # Language instruction
+    lang_instruction = f"Answer in {language}." if language != "English" else ""
+    
+    full_prompt = f"""
+{template.format(subject=subject, chapter=chapter, question=question)}
+    
+Context from textbook:
+{context}
 
-    Returns:
-        Complete prompt string for Gemini
-    """
-
-    prompt = f"""
-You are an expert AP SSC (Andhra Pradesh State Board of Secondary Education - BSEAP)
-Class 10 tutor preparing students for March 2026 board exams.
-
-📚 BOARD: AP SSC Class 10 (2025–26 Syllabus)
-📖 MEDIUM: Telugu/English (simple student-friendly language)
-📘 SUBJECT: {subject}
-📗 CHAPTER: {chapter}
-🎓 CLASS: {class_level}
-
-🧑‍🎓 STUDENT QUESTION:
-"{question}"
-
----
-
-🎯 ANSWER REQUIREMENTS (Follow strictly):
-
-1. **SYLLABUS**:
-   - Answer ONLY from AP SSC 2025–26 syllabus
-
-2. **MATHS / SCIENCE**:
-   - Show ALL working steps
-   - Box final answer as:
-     **Final Answer:**
-   - Mention 1–2 common student mistakes
-
-3. **SOCIAL STUDIES**:
-   - Use exact dates, events, and key terms
-   - Highlight important exam points
-
-4. **LANGUAGES**:
-   - Telugu: Simple grammar explanations
-   - English/Hindi: Board-exam pattern focus
-
-5. **FORMAT**:
-   - Structured, exam-ready
-   - Suitable for 4–8 mark answers
-
-6. **OUT OF SYLLABUS**:
-   - Clearly say:
-     "This topic is not in AP SSC Class 10 syllabus."
-   - Suggest closest related topic if possible
-
----
-
-Respond like a helpful senior explaining clearly to a Class 10 student.
-Use bullet points, numbered steps, and clear formatting.
-Keep it concise but complete.
-"""
-
-    return prompt.strip()
+Instructions:
+- Follow AP SSC exam pattern (2/4/5 marks)
+- Use simple Telugu/English as per student level
+{lang_instruction}
+- End with "మరిన్ని ప్రశ్నలు ఉంటే చెప్పండి!" or "Ask more questions!"
+    """.strip()
+    
+    return full_prompt
