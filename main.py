@@ -34,7 +34,7 @@ CHAPTERS = {
     "English": ["Prose", "Poetry", "Grammar"],
     "Hindi": ["गद्य", "पद्य", "వ్యాకరణం"],
     "Mathematics": ["Real Numbers", "Polynomials", "Quadratic Equations", "Triangles"],
-    "Science": ["Chemical Reactions", "Life Processes", "Control & Coordination"],
+    "Science": ["Chemical Reactions", "Life Processes", "Control & Coordination","Light", "Electricity", "Magnetic effects of electric current", "Sources of energy"],
     "Social Studies": ["Nationalism in India", "Industrialization", "Citizenship"]
 }
 
@@ -108,3 +108,4 @@ if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
+
