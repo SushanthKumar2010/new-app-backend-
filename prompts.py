@@ -1,10 +1,8 @@
-# prompts.py - Advanced educational prompts for AP SSC Class 10
+# prompts.py - Educational prompts for AP SSC Class 10 (unchanged)
 SUBJECT_TEMPLATES = {
     "Mathematics": """
-    You are teaching AP SSC Class 10 Mathematics.
-    
-    Question: {question}
-    Chapter: {chapter}
+    AP SSC Class 10 {subject} - Chapter: {chapter}
+    Student Question: {question}
     
     Provide:
     1. Step-by-step solution with formulas
@@ -16,10 +14,8 @@ SUBJECT_TEMPLATES = {
     """,
     
     "Science": """
-    You are teaching AP SSC Class 10 Science.
-    
-    Question: {question}
-    Chapter: {chapter}
+    AP SSC Class 10 {subject} - Chapter: {chapter}
+    Student Question: {question}
     
     Answer format:
     1. Definition + diagram (text-based)
@@ -31,10 +27,8 @@ SUBJECT_TEMPLATES = {
     """,
     
     "English": """
-    You are teaching AP SSC Class 10 English.
-    
-    Question: {question}
-    Chapter: {chapter}
+    AP SSC Class 10 {subject} - Chapter: {chapter}
+    Student Question: {question}
     
     Provide:
     1. Detailed explanation with quotes
@@ -44,10 +38,8 @@ SUBJECT_TEMPLATES = {
     """,
     
     "Telugu": """
-    మీరు AP SSC 10వ తరగతి తెలుగు గురువు.
-    
-    ప్రశ్న: {question}
-    అధ్యాయం: {chapter}
+    AP SSC 10వ తరగతి {subject} - అధ్యాయం: {chapter}
+    విద్యార్థి ప్రశ్న: {question}
     
     తెలుగులో వివరంగా వివరించండి:
     1. ముఖ్య భావాలు
@@ -57,10 +49,8 @@ SUBJECT_TEMPLATES = {
     """,
     
     "Social Studies": """
-    You are teaching AP SSC Class 10 Social Studies.
-    
-    Question: {question}
-    Chapter: {chapter}
+    AP SSC Class 10 {subject} - Chapter: {chapter}
+    Student Question: {question}
     
     Structured answer:
     1. Historical context + timeline
@@ -68,14 +58,23 @@ SUBJECT_TEMPLATES = {
     3. Important personalities
     4. Map work (describe locations)
     5. Exam-style long answer
+    """,
+    
+    "Hindi": """
+    AP SSC कक्षा 10 {subject} - अध्याय: {chapter}
+    छात्र प्रश्न: {question}
+    
+    हिंदी में विस्तृत व्याख्या:
+    1. मुख्य बिंदु
+    2. कवि/लेखक विशेषताएं
+    3. परीक्षा के लिए महत्वपूर्ण पंक्तियां
+    4. 5 अंकों का उत्तर
     """
 }
 
-def get_educational_prompt(subject: str, chapter: str, question: str, 
-                          class_level: str, language: str, contexts: dict) -> str:
-    """Generate complete educational prompt"""
+def get_educational_prompt(subject: str, chapter: str, question: str, class_level: str) -> str:
+    """Generate complete educational prompt for Gemini"""
     
-    # Base template
     template = SUBJECT_TEMPLATES.get(subject, """
     You are an AP SSC Class 10 {subject} teacher.
     
@@ -86,23 +85,8 @@ def get_educational_prompt(subject: str, chapter: str, question: str,
     Include examples, key points, and practice questions.
     """)
     
-    # Subject context
-    context = contexts.get(subject, {}).get(chapter, "")
-    
-    # Language instruction
-    lang_instruction = f"Answer in {language}." if language != "English" else ""
-    
-    full_prompt = f"""
-{template.format(subject=subject, chapter=chapter, question=question)}
-    
-Context from textbook:
-{context}
-
-Instructions:
-- Follow AP SSC exam pattern (2/4/5 marks)
-- Use simple Telugu/English as per student level
-{lang_instruction}
-- End with "మరిన్ని ప్రశ్నలు ఉంటే చెప్పండి!" or "Ask more questions!"
-    """.strip()
-    
-    return full_prompt
+    return template.format(
+        subject=subject, 
+        chapter=chapter, 
+        question=question
+    )
