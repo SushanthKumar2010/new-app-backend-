@@ -4,8 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google import genai
 
-# Import prompts module
-from prompts import get_educational_prompt
+try:
+    from prompts import get_educational_prompt
+except ImportError:
+    print("⚠️ prompts.py not found - using inline prompts")
 
 # ======================
 # CONFIG
@@ -13,9 +15,10 @@ from prompts import get_educational_prompt
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
-    raise RuntimeError("GEMINI_API_KEY not set")
+    raise RuntimeError("❌ GEMINI_API_KEY not set in Render Environment Variables")
 
 MODEL_NAME = os.getenv("MODEL_NAME", "gemini-2.5-flash")
+print(f"✅ Using model: {MODEL_NAME}")
 
 # ======================
 # APP SETUP
@@ -35,13 +38,18 @@ app.add_middleware(
 )
 
 # ======================
-# GEMINI CLIENT (NEW SDK)
+# GEMINI CLIENT
 # ======================
 
-client = genai.Client(api_key=GEMINI_API_KEY)
+try:
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    print("✅ Gemini client initialized")
+except Exception as e:
+    print(f"❌ Gemini client failed: {e}")
+    client = None
 
 # ======================
-# MODELS (matching your frontend)
+# MODELS
 # ======================
 
 class QuestionRequest(BaseModel):
@@ -51,7 +59,7 @@ class QuestionRequest(BaseModel):
     question: str
 
 # ======================
-# CHAPTER VALIDATION (matching your frontend)
+# CHAPTERS
 # ======================
 
 CHAPTERS = {
@@ -76,56 +84,54 @@ def health():
     return {
         "status": "ok",
         "model": MODEL_NAME,
+        "gemini_ready": client is not None,
         "chapters": CHAPTERS
     }
 
-@app.post("/api/chat")
-def simple_chat(data: dict):
-    prompt = (data.get("prompt") or "").strip()
-    if not prompt:
-        raise HTTPException(status_code=400, detail="Prompt is required")
-
-    try:
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=prompt,
-        )
-        return {"response": response.text}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 @app.post("/api/ask")
-def ask_ap_ssc_question(request: QuestionRequest):
-    """✅ Main endpoint - matches your frontend exactly (fixes 405 error)"""
+async def ask_ap_ssc_question(request: QuestionRequest):  # ✅ ASYNC
+    """Main endpoint - matches your frontend"""
     
-    # Validate chapter exists (matching your frontend)
+    print(f"📨 Request: {request.dict()}")  # Debug log
+    
+    # Validate chapter
     if request.chapter not in CHAPTERS.get(request.subject, []):
         raise HTTPException(status_code=400, detail="Invalid chapter for subject")
     
+    if not client:
+        raise HTTPException(status_code=500, detail="Gemini client not initialized")
+    
     try:
-        # ✅ Use advanced prompts.py for structured educational answers
-        prompt = get_educational_prompt(
-            request.subject, 
-            request.chapter, 
-            request.question, 
-            request.class_level
-        )
+        # Simple inline prompt (no prompts.py dependency)
+        prompt = f"""
+You are an expert AP SSC Class {request.class_level} tutor.
+
+Subject: {request.subject}
+Chapter: {request.chapter}
+Question: {request.question}
+
+Provide detailed textbook-style explanation for board exams.
+Include examples and practice questions.
+"""
+        
+        print(f"📝 Prompt length: {len(prompt)} chars")
         
         response = client.models.generate_content(
             model=MODEL_NAME,
             contents=prompt,
             generation_config={
                 "temperature": 0.3,
-                "max_output_tokens": 1200,
-                "top_p": 0.8,
+                "max_output_tokens": 800,
             }
         )
-        answer = (response.text or "I could not generate an answer.").strip()
+        
+        answer = response.text or "No response generated"
+        print(f"✅ Answer length: {len(answer)} chars")
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Gemini error: {e}")
+        print(f"❌ Gemini error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"AI Error: {str(e)}")
 
-    # ✅ Exact response format your frontend expects
     return {
         "answer": answer,
         "meta": {
@@ -136,14 +142,10 @@ def ask_ap_ssc_question(request: QuestionRequest):
     }
 
 @app.get("/api/ask")
-def ask_get():
-    """GET version - shows 405 in browser (expected)"""
-    raise HTTPException(status_code=405, detail="Method Not Allowed. Use POST.")
+async def ask_get():
+    raise HTTPException(status_code=405, detail="Use POST")
 
-# ======================
-# RENDER DEPLOYMENT
-# ======================
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 10000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, log_level="info")
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
