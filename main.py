@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from google import genai
+import google.generativeai as genai
 
 # ---------------- Environment ----------------
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -124,6 +124,7 @@ async def ask_ap_ssc(payload: AskRequest):
             "chapter": payload.chapter
         }
     )
+
 
 
 
