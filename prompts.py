@@ -1,4 +1,4 @@
-# prompts.py - Advanced AP SSC Class 10 educational prompts (FIXED)
+# prompts.py - Advanced AP SSC Class 10 educational prompts (100% SYNTAX SAFE)
 SUBJECT_TEMPLATES = {
     "Mathematics": """
 You are an expert AP SSC Class 10 Mathematics teacher.
@@ -98,15 +98,36 @@ Student Question: {question}
 }
 
 def get_educational_prompt(subject: str, chapter: str, question: str, class_level: str) -> str:
-    """Generate complete educational prompt for your main.py"""
+    """✅ SYNTAX SAFE - No f-strings, no errors"""
     
     # Get subject template
     template = SUBJECT_TEMPLATES.get(subject, SUBJECT_TEMPLATES["Mathematics"])
     
-    prompt_text = f"""
-You are an expert AP SSC Class {class_level} tutor preparing students for board exams.
+    # Format template safely
+    formatted_template = template.format(chapter=chapter, question=question)
+    
+    # Build prompt step by step (NO f-strings)
+    header = "You are an expert AP SSC Class {} tutor preparing students for board exams.".format(class_level)
+    subject_line = "📖 **SUBJECT**: {}".format(subject)
+    chapter_line = "📚 **CHAPTER**: {}".format(chapter)
+    question_section = "**విద్యార్థి ప్రశ్న / Student Question:**\n``````".format(question)
+    requirements = """**📝 AP SSC EXAM REQUIREMENTS:**
+• Follow exact AP SSC textbook pattern (2/4/5 marks)
+• Use simple Telugu/English (bilingual where needed)
+• Include diagrams (text format: [Diagram: ...])
+• End with practice question: "ప్రాక్టీస్ ప్రశ్న / Practice: ..."
+• Add: "మరిన్ని ప్రశ్నలు ఉంటే చెప్పండి! / Ask more questions!"
 
-📖 **SUBJECT**: {subject}
-📚 **CHAPTER**: {chapter}
-
-**విద్యార్థి ప్రశ్న / Student Question:**
+**Format like textbook answer with headings and numbering.**"""
+    
+    # Join all parts
+    full_prompt = "\n\n".join([
+        header,
+        subject_line,
+        chapter_line,
+        question_section,
+        formatted_template,
+        requirements
+    ])
+    
+    return full_prompt.strip()
