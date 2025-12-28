@@ -1,92 +1,148 @@
-# prompts.py - Educational prompts for AP SSC Class 10 (unchanged)
+# prompts.py - Advanced AP SSC Class 10 educational prompts
+# Works with your main.py Gemini backend
+
 SUBJECT_TEMPLATES = {
     "Mathematics": """
-    AP SSC Class 10 {subject} - Chapter: {chapter}
-    Student Question: {question}
-    
-    Provide:
-    1. Step-by-step solution with formulas
-    2. 2 solved examples 
-    3. 1 practice question with answer
-    4. Common exam mistakes to avoid
-    
-    Use simple language. Include diagrams in text form.
-    """,
-    
+You are an expert AP SSC Class 10 Mathematics teacher.
+
+Chapter: {chapter}
+Student Question: {question}
+
+📚 **DETAILED ANSWER REQUIRED:**
+
+1️⃣ **Concept Explanation** (with formulas)
+2️⃣ **Step-by-step solution** (show all working)
+3️⃣ **2 Solved Examples** (similar difficulty)
+4️⃣ **1 Practice Question** + answer
+5️⃣ **Common Exam Mistakes** to avoid
+
+💡 Use AP SSC textbook examples and notation exactly.
+""",
+
     "Science": """
-    AP SSC Class 10 {subject} - Chapter: {chapter}
-    Student Question: {question}
-    
-    Answer format:
-    1. Definition + diagram (text-based)
-    2. Key concepts with examples
-    3. 2-mark/4-mark question style
-    4. Practical application
-    
-    Use textbook terminology exactly.
-    """,
-    
+You are an expert AP SSC Class 10 Science teacher.
+
+Chapter: {chapter}
+Student Question: {question}
+
+🧪 **COMPLETE ANSWER STRUCTURE:**
+
+1️⃣ **Definition** + diagram (text format)
+2️⃣ **Key Concepts** with real examples
+3️⃣ **Chemical/Physical process** explanation
+4️⃣ **2-mark & 4-mark question** format
+5️⃣ **Practical application** + diagram
+
+🔬 Use exact textbook terminology and diagrams.
+""",
+
     "English": """
-    AP SSC Class 10 {subject} - Chapter: {chapter}
-    Student Question: {question}
-    
-    Provide:
-    1. Detailed explanation with quotes
-    2. Character/theme analysis
-    3. Important lines for exams
-    4. 5-mark question answer format
-    """,
-    
+You are an expert AP SSC Class 10 English teacher.
+
+Chapter: {chapter}
+Student Question: {question}
+
+📖 **LITERATURE ANALYSIS:**
+
+1️⃣ **Detailed explanation** with text quotes
+2️⃣ **Character/Theme analysis**
+3️⃣ **Important lines** (5-mark questions)
+4️⃣ **Context & background**
+5️⃣ **Exam-style answer** format
+
+✍️ Quote exact lines from AP SSC textbook.
+""",
+
     "Telugu": """
-    AP SSC 10వ తరగతి {subject} - అధ్యాయం: {chapter}
-    విద్యార్థి ప్రశ్న: {question}
-    
-    తెలుగులో వివరంగా వివరించండి:
-    1. ముఖ్య భావాలు
-    2. కవి/సాహిత్యకారుడి ప్రత్యేకతలు
-    3. పరీక్షకు ముఖ్యమైన పంక్తులు
-    4. 5 మార్కుల ప్రశ్నలకు సమాధానం
-    """,
-    
-    "Social Studies": """
-    AP SSC Class 10 {subject} - Chapter: {chapter}
-    Student Question: {question}
-    
-    Structured answer:
-    1. Historical context + timeline
-    2. Key events with dates
-    3. Important personalities
-    4. Map work (describe locations)
-    5. Exam-style long answer
-    """,
-    
+మీరు AP SSC 10వ తరగతి తెలుగు గురువు.
+
+అధ్యాయం: {chapter}
+విద్యార్థి ప్రశ్న: {question}
+
+📚 **వివరణాత్మక సమాధానం:**
+
+1️⃣ **ముఖ్య భావం** వివరణ
+2️⃣ **కవి/సాహిత్యకారుడు** విశ్లేషణ
+3️⃣ **పరీక్ష ముఖ్య పంక్తులు**
+4️⃣ **5 మార్కుల ప్రశ్న** ఫార్మాట్
+5️⃣ **సమాన ఉదాహరణలు**
+
+📖 పాఠ్యపుస్తకం నుండి ఖచ్చితమైన పంక్తులు ఉపయోగించండి.
+""",
+
     "Hindi": """
-    AP SSC कक्षा 10 {subject} - अध्याय: {chapter}
-    छात्र प्रश्न: {question}
-    
-    हिंदी में विस्तृत व्याख्या:
-    1. मुख्य बिंदु
-    2. कवि/लेखक विशेषताएं
-    3. परीक्षा के लिए महत्वपूर्ण पंक्तियां
-    4. 5 अंकों का उत्तर
-    """
+आप AP SSC कक्षा 10 हिंदी के विशेषज्ञ शिक्षक हैं।
+
+अध्याय: {chapter}
+छात्र प्रश्न: {question}
+
+📚 **विस्तृत उत्तर:**
+
+1️⃣ **मुख्य भाव** की व्याख्या
+2️⃣ **कवि/लेखक** विश्लेषण
+3️⃣ **परीक्षा महत्वपूर्ण पंक्तियाँ**
+4️⃣ **5 अंकों का उत्तर** प्रारूप
+5️⃣ **समान उदाहरण**
+
+📖 पाठ्यपुस्तक से सटीक पंक्तियाँ उद्धृत करें।
+""",
+
+    "Social Studies": """
+You are an expert AP SSC Class 10 Social Studies teacher.
+
+Chapter: {chapter}
+Student Question: {question}
+
+🌍 **COMPLETE EXAM ANSWER:**
+
+1️⃣ **Historical Context** + timeline
+2️⃣ **Key Events** with exact dates
+3️⃣ **Important Personalities**
+4️⃣ **Map Work** (describe locations)
+5️⃣ **5-mark question** format
+
+📅 Use AP SSC textbook dates and facts exactly.
+"""
+}
+
+CHAPTER_SPECIFIC_CONTEXT = {
+    "Mathematics": {
+        "Real Numbers": "Euclid's Division Lemma: For a,b > 0, a = bq + r (0 ≤ r < b). HCF, LCM, Irrational numbers (√2, π)",
+        "Polynomials": "Zeroes of polynomial p(x), Factor theorem, Division algorithm",
+        "Quadratic Equations": "ax² + bx + c = 0, Discriminant D = b²-4ac, Nature of roots",
+    },
+    "Science": {
+        "Chemical Reactions": "Combination, Decomposition, Displacement, Double Displacement, Redox reactions",
+        "Life Processes": "Autotrophic nutrition (photosynthesis), Human digestive system, Respiration (aerobic/anaerobic)",
+        "Control & Coordination": "Reflex arc, Plant hormones (auxin), Human brain parts",
+    },
+    "English": {
+        "Prose": "A Letter to God, Nelson Mandela, From the Diary of Anne Frank (key quotes)",
+        "Poetry": "Dust of Snow, Fire and Ice, A Tiger in the Zoo (poetic devices)",
+    },
+    "Telugu": {
+        "కథలు": "పొత్తి సీతారాములు, అమ్మమొహనం - ముఖ్య సంఘటనలు",
+        "కవిత్వం": "అమరావతి గల్లు, సామాజిక దృక్పథం - కవి భావాలు",
+    }
 }
 
 def get_educational_prompt(subject: str, chapter: str, question: str, class_level: str) -> str:
-    """Generate complete educational prompt for Gemini"""
+    """
+    Generate complete educational prompt for your main.py /api/ask endpoint
+    Returns ready-to-use prompt string for Gemini
+    """
     
-    template = SUBJECT_TEMPLATES.get(subject, """
-    You are an AP SSC Class 10 {subject} teacher.
+    # Get subject template
+    template = SUBJECT_TEMPLATES.get(subject, SUBJECT_TEMPLATES["Mathematics"])
     
-    Question: {question}
-    Chapter: {chapter}
+    # Get chapter context
+    context = CHAPTER_SPECIFIC_CONTEXT.get(subject, {}).get(chapter, "")
     
-    Provide detailed textbook-style explanation for board exams.
-    Include examples, key points, and practice questions.
-    """)
-    
-    return template.format(
-        subject=subject, 
-        chapter=chapter, 
-        question=question
-    )
+    full_prompt = f"""
+You are an expert AP SSC Class {class_level} tutor preparing students for board exams.
+
+📖 **SUBJECT**: {subject}
+📚 **CHAPTER**: {chapter}
+{'📄 **CONTEXT**: ' + context if context else ''}
+
+**విద్యార్థి ప్రశ్న / Student Question:**
