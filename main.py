@@ -4,6 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google import genai
 
+# Import prompts module
+from prompts import get_educational_prompt
+
 # ======================
 # CONFIG
 # ======================
@@ -56,7 +59,7 @@ CHAPTERS = {
     "English": ["Prose", "Poetry", "Grammar"],
     "Hindi": ["गद्य", "पद्य", "వ్యాకరణం"],
     "Mathematics": ["Real Numbers", "Polynomials", "Quadratic Equations", "Triangles"],
-    "Science": ["Chemical Reactions", "Life Processes", "Control & Coordination", "Light", "Electricity", "Magnetic effects of electric current", "Sources of energy"],
+    "Science": ["Chemical Reactions", "Life Processes", "Control & Coordination"],
     "Social Studies": ["Nationalism in India", "Industrialization", "Citizenship"]
 }
 
@@ -92,46 +95,33 @@ def simple_chat(data: dict):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/ask")
-def ask_ap_ssc_question(request: QuestionRequest):  # ✅ Uses your exact Pydantic model
+def ask_ap_ssc_question(request: QuestionRequest):
     """✅ Main endpoint - matches your frontend exactly (fixes 405 error)"""
     
     # Validate chapter exists (matching your frontend)
     if request.chapter not in CHAPTERS.get(request.subject, []):
         raise HTTPException(status_code=400, detail="Invalid chapter for subject")
     
-    prompt = f"""
-You are an expert AP SSC Class {request.class_level} tutor.
-
-Subject: {request.subject}
-Chapter: {request.chapter}
-
-Student Question:
-\"\"\"
-{request.question}
-\"\"\"
-
-Requirements:
-- Give a clear, step-by-step solution for AP SSC exams
-- Use Class 10 textbook language and methods
-- Show all important working (for Maths/Science)
-- Mention common exam mistakes to avoid
-- Include 1 practice question at the end
-- Answer in simple Telugu/English as per subject
-- Follow AP SSC 2/4/5 mark question pattern
-
-Format your answer like a textbook explanation.
-"""
-
     try:
+        # ✅ Use advanced prompts.py for structured educational answers
+        prompt = get_educational_prompt(
+            request.subject, 
+            request.chapter, 
+            request.question, 
+            request.class_level
+        )
+        
         response = client.models.generate_content(
             model=MODEL_NAME,
             contents=prompt,
             generation_config={
                 "temperature": 0.3,
                 "max_output_tokens": 1200,
+                "top_p": 0.8,
             }
         )
         answer = (response.text or "I could not generate an answer.").strip()
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gemini error: {e}")
 
